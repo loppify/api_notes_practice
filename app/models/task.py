@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from app.models.user import User
     from app.models.tag import Tag
 
+
 class StatusEnum(str, enum.Enum):
     UNCOMPLETED = "UNCOMPLETED"
     COMPLETED = "COMPLETED"
@@ -30,10 +31,12 @@ class Task(Base):
     user: Mapped["User"] = relationship(
         "User",
         back_populates="tasks",
+        lazy="selectin",
     )
 
     tags: Mapped[list["Tag"]] = relationship(
         "Tag",
         secondary=task_tags,
         back_populates="tasks",
+        lazy="selectin",
     )

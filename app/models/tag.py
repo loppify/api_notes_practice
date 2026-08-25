@@ -13,8 +13,9 @@ class Tag(Base):
     description: Mapped[str] = mapped_column(unique=True)
     amount: Mapped[int]
 
-    task: Mapped[list["Task"]] = relationship(
+    tasks: Mapped[list["Task"]] = relationship(
         "Task",
         secondary=task_tags,
         back_populates="tags",
+        lazy="selectin",
     )

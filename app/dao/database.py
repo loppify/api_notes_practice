@@ -6,24 +6,10 @@ from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, declared_attr
 
 from app.config import settings
 
-DATABASE_URL = settings.get_db_url()
+DATABASE_URL = settings.db_url
 
 engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
-
-def connection(method):
-    async def wrapper(*args, **kwargs):
-        async with async_session_maker() as session:
-            try:
-                return await method(*args, session=session, **kwargs)
-            except Exception as e:
-                await session.rollback()
-                raise e
-            finally:
-                await session.close()
-
-    return wrapper
 
 
 class Base(AsyncAttrs, DeclarativeBase):

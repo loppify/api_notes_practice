@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import Base
+from app.dao.database import Base
 from app.models.task_tags import task_tags
 
 if TYPE_CHECKING:

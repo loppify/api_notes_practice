@@ -7,20 +7,13 @@ from app.models.task import Task
 from app.models.user import User
 
 
-class UserDao(BaseDAO):
+class UserDao(BaseDAO[User]):
     model = User
 
-    @classmethod
-    async def get_all_users(cls, session: AsyncSession):
-        query = select(cls.model)
-        res = await session.execute(query)
-        records = res.scalars().all()
-        return records
 
-
-class TaskDao(BaseDAO):
+class TaskDao(BaseDAO[Task]):
     model = Task
 
 
-class TagDao(BaseDAO):
+class TagDao(BaseDAO[Tag]):
     model = Tag

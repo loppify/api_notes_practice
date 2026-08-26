@@ -6,12 +6,11 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.database import DATABASE_URL, Base
+from app.dao.database import DATABASE_URL, Base
 from app.models.user import User
 from app.models.task import Task
 from app.models.tag import Tag
-from app.models.task_tags import task_tags
-
+import app.models.task_tags
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

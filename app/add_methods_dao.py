@@ -1,27 +1,23 @@
-from asyncio import run
 from typing import List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dao.dao import UserDao
-from app.database import connection
+from app.dao.dao import TaskDao, UserDao
+from app.dao.session_maker import connection
 
 
-@connection
-async def add_one(user_data: dict, session: AsyncSession) -> int:
-    new_user = await UserDao.add(session=session, **user_data)
-    print("Added new user. ID: ", new_user.id)
-    return new_user.id
+@connection()
+async def add_one(task_data: dict, session: AsyncSession) -> int:
+    new_task = await TaskDao.add(session=session, values=task_data)
+    return new_task.id
 
-@connection
-async def add_many(user_data: List[dict], session: AsyncSession):
-    new_users = await UserDao.add_all(session=session, instances=user_data)
-    users_id = [user.id for user in new_users]
-    print("Added new user. ID: ", users_id)
-    return users_id
+@connection()
+async def add_many(task_data: List[dict], session: AsyncSession):
+    new_tasks = await TaskDao.add_all(session=session, instances=task_data)
+    tasks_id = [task.id for task in new_tasks]
+    return tasks_id
 
-users = [
-    {"username": "123", "email": "12.34@example.com", "password": "davispassword"},
-    {"username": "345", "email": "45.67@example.com", "password": "whiteSecure"},
-]
-run(add_many(users))
+@connection()
+async def add_one_user(user_data: dict, session: AsyncSession) -> int:
+    new_task = await UserDao.add(session=session, values=user_data)
+    return new_task.id

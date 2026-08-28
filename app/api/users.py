@@ -1,26 +1,22 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi.exceptions import ResponseValidationError
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.add_methods_dao import add_one, add_one_user
-from app.dao.dao import TaskDao
-from app.schemas.task_pd import TaskCreate
-from app.schemas.user_pd import UserPydantic
-from app.select_methods_dao import select_all_users
+from app.dao.dao import UserDao
+from app.dao.session_maker import get_session
+from app.schemas.user_pd import UserCreate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("/", response_model=int, status_code=status.HTTP_201_CREATED)
-async def add_user(task: UserPydantic):
-    created_task = {**task.model_dump()}
-    res = await add_one_user(created_task)
-    return res
-
-
 @router.get("/")
-async def get_users():
-    all_users = await select_all_users()
-    res = []
-    for i in all_users:
-        user_pydatnic = UserPydantic.model_validate(i)
-        res.append(user_pydatnic.model_dump())
-    return res
+async def get_users(session: AsyncSession = Depends(get_session)):
+    return await UserDao.get_all(session)
+
+
+@router.post("/", response_model=int, status_code=status.HTTP_201_CREATED)
+async def add_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
+    created_user = {**user.model_dump()}
+    return await UserDao.add(values=created_user, session=session)
+

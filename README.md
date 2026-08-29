@@ -20,7 +20,6 @@ A REST API backend service designed for note taking app with tags for tasks and 
 
 ## Features
 
-* User authentication and authorization (JWT tokens)
 * Full CRUD operations for tasks. Not full users and tags
 * Automated database migrations with Alembic
 * Interactive API documentation via Swagger UI

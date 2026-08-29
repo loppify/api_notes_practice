@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from pydantic import computed_field
@@ -15,15 +14,16 @@ class Settings(BaseSettings):
     DB_HOST: str | None
 
     model_config = SettingsConfigDict(
-        env_file=BASE_DIR / ".env",
-        env_file_encoding="utf-8",
-        extra="ignore"
+        env_file=BASE_DIR / ".env", env_file_encoding="utf-8", extra="ignore"
     )
+
     @computed_field
     @property
     def db_url(self) -> str:
-        return (f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@"
-                f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}")
+        return (
+            f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@"
+            f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        )
 
 
 settings = Settings()

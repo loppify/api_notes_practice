@@ -7,6 +7,7 @@ from app.dao.database import Base
 if TYPE_CHECKING:
     from app.models.task import Task
 
+
 class User(Base):
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)

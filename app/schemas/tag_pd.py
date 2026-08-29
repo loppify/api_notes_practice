@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, ConfigDict
 
 
@@ -11,9 +9,13 @@ class TagBase(BaseModel):
 
 
 class TagCreate(TagBase):
-    user_id: Optional[int] = None
+    user_id: int | None = None
 
 
 class TagRead(TagBase):
     id: int
-    amount: int = 0
+    user_id: int | None = None
+
+
+class TagReadWithAmount(TagRead):
+    amount: int | None = None

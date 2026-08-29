@@ -1,10 +1,10 @@
 import re
-from typing import Optional, Tuple
-from sqlalchemy.exc import IntegrityError
+
 import asyncpg
+from sqlalchemy.exc import IntegrityError
 
 
-def parse_integrity_error(exc: IntegrityError) -> Tuple[str, str]:
+def parse_integrity_error(exc: IntegrityError) -> tuple[str, str]:
     """
     :returns: Tuple[Field or Restriction name, Detailed error message]
     """
@@ -18,7 +18,10 @@ def parse_integrity_error(exc: IntegrityError) -> Tuple[str, str]:
         match = re.search(r"Key \((.*?)\)=\((.*?)\) already exists", detail)
         if match:
             field_name, value = match.groups()
-            return field_name, f"Record with '{value}' for field '{field_name}' already existі."
+            return (
+                field_name,
+                f"Record with '{value}' for field '{field_name}' already existі.",
+            )
 
         # Фолбек на назву обмеження
         constraint = asyncpg_error.constraint_name or "unknown"
@@ -29,7 +32,10 @@ def parse_integrity_error(exc: IntegrityError) -> Tuple[str, str]:
         match = re.search(r"Key \((.*?)\)=\((.*?)\) is not present in table", detail)
         if match:
             field_name, value = match.groups()
-            return field_name, f"Related record '{field_name}' with value '{value}' is not  present."
+            return (
+                field_name,
+                f"Related record '{field_name}' with value '{value}' is not  present.",
+            )
 
         constraint = asyncpg_error.constraint_name or "unknown"
         return constraint, f"Violated foreign key '{constraint}'."

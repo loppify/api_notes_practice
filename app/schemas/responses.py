@@ -1,28 +1,27 @@
-from typing import Optional, List
-
 from pydantic import ConfigDict
 
 from app.models.task import StatusEnum
-from app.schemas.tag_pd import TagRead, TagBase
+from app.schemas.tag_pd import TagBase, TagRead
 from app.schemas.task_pd import TaskBase
-from app.schemas.user_pd import UserBase
+from app.schemas.user_pd import UserRead
 
 
 class TaskRead(TaskBase):
     id: int
     status: StatusEnum
-    tags: Optional[List[TagRead]] = None
+    tags: list[TagRead] | None = []
+    user: UserRead | None = None
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
 
-class UserRead(UserBase):
-    id: int
-    tasks: Optional[List[TaskRead]] = []
+class UserWithTasks(UserRead):
+    tasks: list[TaskRead] = []
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class TagReadWithUsers(TagBase):
-    id: int
-    users: Optional[List[UserRead]] = []
+    users: list[UserRead] | None = []
+
+    model_config = ConfigDict(from_attributes=True)

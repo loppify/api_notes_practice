@@ -2,18 +2,18 @@ import enum
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, DateTime
+from sqlalchemy import DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.dao.database import Base
 from app.models.task_tags import task_tags
 
 if TYPE_CHECKING:
-    from app.models.user import User
     from app.models.tag import Tag
+    from app.models.user import User
 
 
-class StatusEnum(str, enum.Enum):
+class StatusEnum(enum.StrEnum):
     UNCOMPLETED = "UNCOMPLETED"
     COMPLETED = "COMPLETED"
     REMOVED = "REMOVED"
@@ -24,9 +24,15 @@ class StatusEnum(str, enum.Enum):
 class Task(Base):
     title: Mapped[str]
     description: Mapped[str]
-    deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
-    status: Mapped[StatusEnum] = mapped_column(default=StatusEnum.UNCOMPLETED, server_default="'UNCOMPLETED'")
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    deadline: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    status: Mapped[StatusEnum] = mapped_column(
+        default=StatusEnum.UNCOMPLETED, server_default="'UNCOMPLETED'"
+    )
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=True
+    )
 
     user: Mapped["User"] = relationship(
         "User",

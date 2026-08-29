@@ -1,6 +1,5 @@
-from functools import wraps
-from typing import Optional, AsyncGenerator
-from sqlalchemy import text
+from collections.abc import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao.database import async_session_maker

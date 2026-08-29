@@ -12,8 +12,10 @@ if TYPE_CHECKING:
 
 class Tag(Base):
     name: Mapped[str] = mapped_column(unique=True)
-    description: Mapped[str] = mapped_column(unique=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    description: Mapped[str] = mapped_column(nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=True
+    )
 
     tasks: Mapped[list["Task"]] = relationship(
         "Task",

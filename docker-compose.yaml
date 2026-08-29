@@ -9,16 +9,54 @@ services:
       - "8000:8000"
     environment:
       DB_HOST: postgres
-      DB_PORT: ${PORT}
+      DB_PORT: 5432
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - ./app:/app/app
-    networks:
-      - existing_db_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/pgdata
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    command: >
+      postgres -c max_connections=100
+               -c shared_buffers=128MB
+               -c maintenance_work_mem=32MB
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
 
 networks:
   existing_db_network:
     external: true
     name: task_app_db_default
+
+volumes:
+  pgdata:
+    driver: local

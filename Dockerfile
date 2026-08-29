@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml uv.lock* ./
 RUN uv sync --frozen --no-install-project
 ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH="/app:$PYTHONPATH"
 
 COPY app ./app
 COPY migration ./migration

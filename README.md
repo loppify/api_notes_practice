@@ -9,6 +9,15 @@
 [![Alembic](https://img.shields.io/badge/Alembic-Migrations-6BA81E)](https://alembic.sqlalchemy.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker\&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+## 🌐 Live Demo
+
+The API is available online through Render:
+
+**Production API:** `https://api-notes-practice.onrender.com`
+
+**Swagger UI:** `https://api-notes-practice.onrender.com/docs`
+
+**ReDoc:** `https://api-notes-practice.onrender.com/redoc`
 
 ## 🚀 Overview
 

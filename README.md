@@ -13,11 +13,11 @@
 
 The API is available online through Render:
 
-**Production API:** `https://api-notes-practice.onrender.com`
+**Production API:** https://api-notes-practice.onrender.com
 
-**Swagger UI:** `https://api-notes-practice.onrender.com/docs`
+**Swagger UI:** https://api-notes-practice.onrender.com/docs
 
-**ReDoc:** `https://api-notes-practice.onrender.com/redoc`
+**ReDoc:** https://api-notes-practice.onrender.com/redoc
 
 ## 🚀 Overview
 

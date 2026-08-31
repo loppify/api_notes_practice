@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.dao.dao import UserDao
 from app.dao.session_maker import get_session
 from app.schemas.responses import UserWithTasks
-from app.schemas.user_pd import Token, TokenData, UserCreate
+from app.schemas.user_pd import Token, TokenData, UserCreate, UserRead, UserUpdate
 from app.utils.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     ALGORITHM,
@@ -23,12 +23,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-@router.post("/register")
+@router.post("/register", response_model=UserWithTasks)
 async def register(user: UserCreate, session: AsyncSession = Depends(get_session)):
     return await UserDao.register(session, user)
 
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: AsyncSession = Depends(get_session),
@@ -47,7 +47,6 @@ async def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.get("/me", response_model=UserWithTasks)
 async def get_me(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: AsyncSession = Depends(get_session),
@@ -68,4 +67,11 @@ async def get_me(
     user = await UserDao.get_user(session, token_data.username)
     if user is None:
         raise credentials_exception
+    return user
+
+
+@router.get("/me", response_model=UserWithTasks)
+async def get_my_data(
+    user: Annotated[str, Depends(get_me)],
+):
     return user

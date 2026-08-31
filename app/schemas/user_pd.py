@@ -17,9 +17,9 @@ class UserRead(UserBase):
 
 
 class UserUpdate(UserBase):
-    username: str | None
-    email: str | None
-    password: str | None
+    username: str | None = None
+    email: str | None = None
+    password: str | None = None
 
 
 class Token(BaseModel):
@@ -29,3 +29,4 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+    user_id: int | None = None

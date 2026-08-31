@@ -36,3 +36,4 @@ async def add_task(task: TaskCreate, session: AsyncSession = Depends(get_session
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(item_id: int, session: AsyncSession = Depends(get_session)):
     return await TaskDao.delete(item_id=item_id, session=session)
+

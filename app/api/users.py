@@ -1,10 +1,13 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.auth import get_me
 from app.dao.dao import UserDao
 from app.dao.session_maker import get_session
 from app.schemas.responses import UserRead, UserWithTasks
-from app.schemas.user_pd import UserCreate
+from app.schemas.user_pd import UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -19,6 +22,19 @@ async def get_user(user_id: int, session: AsyncSession = Depends(get_session)):
     return await UserDao.get_by_id(item_id=user_id, session=session)
 
 
-@router.post("/", response_model=int, status_code=status.HTTP_201_CREATED)
-async def add_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
-    return await UserDao.add(values=user, session=session)
+@router.patch("/", status_code=status.HTTP_202_ACCEPTED)
+async def update_user(
+    data: UserUpdate,
+    current_user: Annotated[UserRead, Depends(get_me)],
+    session: AsyncSession = Depends(get_session),
+):
+    return await UserDao.update(current_user.id, session, data)
+
+
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    user: Annotated[UserRead, Depends(get_me)],
+    session: AsyncSession = Depends(get_session),
+):
+
+    return await UserDao.delete(user.id, session)

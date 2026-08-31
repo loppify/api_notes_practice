@@ -19,3 +19,8 @@ class TagRead(TagBase):
 
 class TagReadWithAmount(TagRead):
     amount: int | None = None
+
+
+class TagUpdate(TagBase):
+    name: str | None = None
+    description: str | None = None

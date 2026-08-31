@@ -5,7 +5,7 @@ from starlette import status
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import JSONResponse
 
-from app.utils import parse_integrity_error
+from app.utils.integrity_error_parser import parse_integrity_error
 
 
 def register_exception_handlers(app: FastAPI) -> None:

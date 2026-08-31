@@ -1,4 +1,6 @@
+from pwdlib import PasswordHash
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,10 +8,35 @@ from app.dao.base import BaseDAO
 from app.models.tag import Tag
 from app.models.task import Task
 from app.models.user import User
+from app.schemas.user_pd import UserCreate
 
 
 class UserDao(BaseDAO[User]):
     model = User
+    password_hash = PasswordHash.recommended()
+    DUMMY_HASH = password_hash.hash("dummypassword")
+
+    @classmethod
+    async def register(cls, session: AsyncSession, values: BaseModel) -> User:
+        v_dict = values.model_dump(exclude_unset=True)
+        v_dict["password"] = cls._get_password_hash(v_dict["password"])
+
+        new_user_id = await cls.add(session, UserCreate(**v_dict))
+        new_user = await cls.get_by_id(session, new_user_id)
+        return new_user
+
+    @classmethod
+    def _get_password_hash(cls, password: str) -> str:
+        return cls.password_hash.hash(password)
+
+    @classmethod
+    async def get_user(cls, session: AsyncSession, username: str | None) -> User | None:
+        try:
+            stmt = select(cls.model).where(cls.model.username == username)
+            res = await session.scalar(stmt)
+            return res
+        except SQLAlchemyError:
+            raise
 
 
 class TaskDao(BaseDAO[Task]):

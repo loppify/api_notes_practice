@@ -404,26 +404,6 @@ This project is intentionally structured to make that workflow straightforward a
 
 ---
 
-# 🗺️ Roadmap
-
-Potential improvements and future work include:
-
-* [ ] Expand automated test coverage
-* [ ] Add integration tests with PostgreSQL
-* [ ] Improve API error handling
-* [ ] Add pagination for collection endpoints
-* [ ] Add filtering and sorting
-* [ ] Improve tag management
-* [ ] Add refresh-token support
-* [ ] Add password reset functionality
-* [ ] Add rate limiting
-* [ ] Add CI/CD with GitHub Actions
-* [ ] Add production deployment configuration
-* [ ] Add API versioning
-* [ ] Add structured application logging
-* [ ] Add health/readiness endpoints
-
----
 
 # 🎯 What This Project Demonstrates
 

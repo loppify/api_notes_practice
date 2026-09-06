@@ -9,7 +9,6 @@ class TaskBase(BaseModel):
     title: str
     description: str
     deadline: datetime | None = None
-    user_id: int | None = None
 
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 

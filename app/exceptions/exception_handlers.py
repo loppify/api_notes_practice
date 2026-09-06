@@ -1,10 +1,13 @@
-from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError, ResponseValidationError
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import (
+    HTTPException,
+    RequestValidationError,
+    ResponseValidationError,
+)
+from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
-from starlette import status
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.responses import JSONResponse
 
+from app.exceptions.custom_exceptions import CREDENTIALS_EXCEPTION
 from app.utils.integrity_error_parser import parse_integrity_error
 
 
@@ -21,9 +24,8 @@ def register_exception_handlers(app: FastAPI) -> None:
             },
         )
 
-    # Обробка 404 (неіснуючі роути або HTTPException(status_code=404))
     @app.exception_handler(404)
-    async def handle_not_found(request: Request, e: StarletteHTTPException):
+    async def handle_not_found(request: Request, e: HTTPException):
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={
@@ -32,7 +34,6 @@ def register_exception_handlers(app: FastAPI) -> None:
             },
         )
 
-    # Обробка невалідних даних від клієнта (Body, Query, Path)
     @app.exception_handler(RequestValidationError)
     async def handle_request_validation_error(
         request: Request, e: RequestValidationError
@@ -42,7 +43,6 @@ def register_exception_handlers(app: FastAPI) -> None:
             content={"error": "Validation Error", "detail": e.errors()},
         )
 
-    # Обробка помилок у структурі відповіді бекенду
     @app.exception_handler(ResponseValidationError)
     async def handle_response_validation_error(
         request: Request, e: ResponseValidationError

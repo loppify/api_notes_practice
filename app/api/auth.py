@@ -9,8 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao.dao import UserDao
 from app.dao.session_maker import get_session
+from app.exceptions.custom_exceptions import (
+    CREDENTIALS_EXCEPTION,
+)
 from app.schemas.responses import UserWithTasks
-from app.schemas.user_pd import Token, TokenData, UserCreate, UserRead, UserUpdate
+from app.schemas.user_pd import Token, TokenData, UserCreate
 from app.utils.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     ALGORITHM,
@@ -23,7 +26,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-@router.post("/register", response_model=UserWithTasks)
+@router.post("/register", response_model=int)
 async def register(user: UserCreate, session: AsyncSession = Depends(get_session)):
     return await UserDao.register(session, user)
 
@@ -47,26 +50,26 @@ async def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
-async def get_me(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    session: AsyncSession = Depends(get_session),
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+def decode_access_token(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            raise CREDENTIALS_EXCEPTION
         token_data = TokenData(username=username)
     except InvalidTokenError:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
+    return token_data
+
+
+async def get_me(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    session: AsyncSession = Depends(get_session),
+):
+    token_data = decode_access_token(token)
     user = await UserDao.get_user(session, token_data.username)
     if user is None:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
     return user
 
 

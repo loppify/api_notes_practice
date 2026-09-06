@@ -9,8 +9,7 @@ class TagBase(BaseModel):
 
 
 class TagCreate(TagBase):
-    user_id: int | None = None
-
+    ...
 
 class TagRead(TagBase):
     id: int

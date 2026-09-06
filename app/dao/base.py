@@ -9,6 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from app.dao.database import Base
+from app.exceptions.custom_exceptions import (
+    CREDENTIALS_EXCEPTION,
+    OBJECT_NOT_FOUND_EXCEPTION,
+)
+from app.schemas.user_pd import UserRead
 
 T = TypeVar("T", bound=Base)
 
@@ -17,8 +22,11 @@ class BaseDAO(Generic[T]):
     model: type[T]
 
     @classmethod
-    async def add(cls, session: AsyncSession, values: BaseModel) -> int:
+    async def add(
+        cls, session: AsyncSession, values: BaseModel, user: UserRead | None
+    ) -> int:
         values_dict = values.model_dump(exclude_unset=True)
+        values_dict["user_id"] = user.id
         new_instance = cls.model(**values_dict)
         session.add(new_instance)
         try:
@@ -30,8 +38,10 @@ class BaseDAO(Generic[T]):
         return new_instance.id
 
     @classmethod
-    async def get_all(cls, session: AsyncSession) -> list[T]:
-        res = await session.scalars(select(cls.model))
+    async def get_all(cls, user: UserRead, session: AsyncSession) -> list[T]:
+        res = await session.scalars(
+            select(cls.model).where(cls.model.user_id == user.id)
+        )
         return list(res.all())
 
     @classmethod
@@ -56,11 +66,17 @@ class BaseDAO(Generic[T]):
 
     @classmethod
     async def update(
-        cls, item_id: int, session: AsyncSession, values: BaseModel
+        cls,
+        item_id: int,
+        session: AsyncSession,
+        values: BaseModel,
+        user: UserRead | None,
     ) -> T | None:
         values_dict = values.model_dump(exclude_unset=True)
         try:
             record = await session.get(cls.model, item_id)
+            if user.id != record.user_id:
+                raise CREDENTIALS_EXCEPTION
             for key, value in values_dict.items():
                 setattr(record, key, value)
             await session.flush()
@@ -71,9 +87,17 @@ class BaseDAO(Generic[T]):
         return record
 
     @classmethod
-    async def delete(cls, item_id: int, session: AsyncSession):
+    async def delete(cls, item_id: int, session: AsyncSession, user: UserRead | None):
+        if not user:
+            raise CREDENTIALS_EXCEPTION
+
+        user_id = user.id
         try:
             item = await session.get(cls.model, item_id)
+            if not item:
+                raise OBJECT_NOT_FOUND_EXCEPTION
+            if item.user_id != user_id:
+                raise CREDENTIALS_EXCEPTION
             await session.delete(item)
             await session.commit()
         except UnmappedInstanceError as e:

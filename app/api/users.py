@@ -22,13 +22,13 @@ async def get_user(user_id: int, session: AsyncSession = Depends(get_session)):
     return await UserDao.get_by_id(item_id=user_id, session=session)
 
 
-@router.patch("/", status_code=status.HTTP_202_ACCEPTED)
+@router.patch("/", response_model=UserRead)
 async def update_user(
     data: UserUpdate,
     current_user: Annotated[UserRead, Depends(get_me)],
     session: AsyncSession = Depends(get_session),
 ):
-    return await UserDao.update(current_user.id, session, data)
+    return await UserDao.update_user(current_user.id, session, data)
 
 
 @router.delete("/", status_code=status.HTTP_204_NO_CONTENT)

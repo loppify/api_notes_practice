@@ -1,468 +1,157 @@
-# 📝 Notes API
+# Notes and Tasks API
 
-> A production-style REST API for a note-taking and task management application, built with **FastAPI, PostgreSQL, SQLAlchemy 2.0, Alembic, and Docker**.
+A backend practice project built with FastAPI, Pydantic, asynchronous SQLAlchemy, PostgreSQL, and Alembic.
 
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python\&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.1+-009688?logo=fastapi\&logoColor=white)](https://fastapi.tiangolo.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-4169E1?logo=postgresql\&logoColor=white)](https://www.postgresql.org/)
-[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-D71F00)](https://www.sqlalchemy.org/)
-[![Alembic](https://img.shields.io/badge/Alembic-Migrations-6BA81E)](https://alembic.sqlalchemy.org/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker\&logoColor=white)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-## 🌐 Live Demo
+I built this project to understand how request validation, relational models, database migrations, authentication, and authorization fit together. It is a completed learning project with follow-up fixes, rather than an ongoing note-taking product.
 
-The API is available online through Render:
+[API demo](https://api-notes-practice.onrender.com/) · [Swagger UI](https://api-notes-practice.onrender.com/docs) · [ReDoc](https://api-notes-practice.onrender.com/redoc)
 
-**Production API:** https://api-notes-practice.onrender.com
+## Implemented features
 
-**Swagger UI:** https://api-notes-practice.onrender.com/docs
+- User registration and JWT login with expiring access tokens.
+- Password hashing during registration and password updates.
+- Authenticated task listing filtered by the current user.
+- Task and tag creation associated with the authenticated user.
+- Ownership checks on task and tag update/delete operations.
+- Task-tag relationships and tag usage counts.
+- Pydantic request and response models.
+- Asynchronous PostgreSQL access through SQLAlchemy and asyncpg.
+- Versioned schema changes with Alembic.
+- Docker Compose configuration and unit tests for selected model and security behavior.
 
-**ReDoc:** https://api-notes-practice.onrender.com/redoc
+## Stack
 
-## 🚀 Overview
+| Area | Tools |
+| --- | --- |
+| API | Python, FastAPI, Uvicorn |
+| Validation | Pydantic, Pydantic Settings |
+| Database | PostgreSQL, SQLAlchemy 2, asyncpg |
+| Migrations | Alembic |
+| Authentication | PyJWT, pwdlib with Argon2 |
+| Development | uv, Docker Compose, pytest, Ruff |
 
-**Notes API** is a backend service designed for a note-taking application with task management, tags, and user authentication.
+## Run locally
 
-The project was built as a practical backend engineering project to explore modern Python API development and demonstrate how the different layers of a real-world application fit together:
-
-* REST API design with **FastAPI**
-* Database modeling with **SQLAlchemy 2.0**
-* Schema validation with **Pydantic**
-* PostgreSQL database integration
-* Version-controlled database migrations with **Alembic**
-* JWT-based authentication and authorization
-* Containerized development with **Docker Compose**
-* Dependency management with **uv**
-* Interactive API documentation with **Swagger / OpenAPI**
-
-The goal is not just to expose endpoints, but to provide a clean foundation that can be extended into a larger production application.
-
----
-
-## ✨ Features
-
-### 🔐 Authentication & Authorization
-
-* User authentication using JWT tokens
-* Protected API endpoints
-* Token-based authorization
-* Configuration through environment variables
-
-### 📋 Task Management
-
-* Create tasks
-* Retrieve tasks
-* Update tasks
-* Delete tasks
-* Associate tasks with application users
-
-### 🏷️ Tags
-
-* Support for tagging application data
-* Structured data models for future extension of tag functionality
-
-### 🗄️ Database
-
-* PostgreSQL as the primary database
-* SQLAlchemy 2.0 ORM
-* Explicit database models
-* Pydantic schemas for request/response validation
-* Alembic migrations for version-controlled schema changes
-
-### 🐳 Development & Deployment
-
-* Dockerized application
-* Docker Compose development environment
-* Reproducible dependency installation with `uv`
-* Environment-based configuration
-* Automatic API documentation through FastAPI/OpenAPI
-
----
-
-## 🛠️ Tech Stack
-
-| Technology            | Purpose                           |
-| --------------------- | --------------------------------- |
-| **Python 3.11+**      | Backend language                  |
-| **FastAPI**           | REST API framework                |
-| **PostgreSQL**        | Relational database               |
-| **SQLAlchemy 2.0**    | ORM / database access             |
-| **Alembic**           | Database migrations               |
-| **Pydantic**          | Data validation and serialization |
-| **Pydantic Settings** | Application configuration         |
-| **JWT**               | Authentication                    |
-| **Docker**            | Containerization                  |
-| **Docker Compose**    | Local service orchestration       |
-| **uv**                | Python dependency management      |
-| **Swagger / OpenAPI** | Interactive API documentation     |
-
----
-
-## 🏗️ Architecture
-
-The application follows a layered backend structure designed to keep API routing, business logic, database access, and data validation separated.
-
-```text
-┌───────────────────────────┐
-│        API Client         │
-│   Web / Mobile / Postman  │
-└─────────────┬─────────────┘
-              │ HTTP / JSON
-              ▼
-┌───────────────────────────┐
-│        FastAPI API        │
-│      Routes / Endpoints   │
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│       Pydantic Schemas    │
-│ Validation / Serialization│
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│       DAO / DB Layer      │
-│    Database Operations    │
-└─────────────┬─────────────┘
-              │ SQLAlchemy
-              ▼
-┌───────────────────────────┐
-│        PostgreSQL         │
-└───────────────────────────┘
-
-        ▲
-        │
-┌───────┴───────────────────┐
-│         Alembic           │
-│    Database Migrations    │
-└───────────────────────────┘
-```
-
----
-
-## 📁 Project Structure
-
-```text
-.
-├── app/
-│   ├── api/                  # API routes and endpoints
-│   ├── dao/                  # Database access layer
-│   ├── models/               # SQLAlchemy models
-│   ├── schemas/              # Pydantic schemas
-│   └── main.py               # FastAPI application entry point
-│
-├── migration/                # Alembic migration scripts
-│
-├── .env.example              # Environment variable template
-├── .gitignore
-├── Dockerfile                # Application container
-├── docker-compose.yaml       # Application + PostgreSQL services
-├── alembic.ini               # Alembic configuration
-├── Makefile                  # Development commands
-├── pyproject.toml            # Project metadata and dependencies
-├── uv.lock                   # Locked dependency versions
-├── LICENSE
-└── README.md
-```
-
----
-
-# ⚡ Quick Start
-
-## Prerequisites
-
-Make sure you have the following installed:
-
-* [Docker](https://www.docker.com/)
-* Docker Compose
-* [Git](https://git-scm.com/)
-* [uv](https://docs.astral.sh/uv/) — required for local development outside Docker
-
----
-
-## 1. Clone the repository
+Requirements: Python 3.11 or newer, [uv](https://docs.astral.sh/uv/), and Docker with Compose.
 
 ```bash
 git clone https://github.com/loppify/api_notes_practice.git
 cd api_notes_practice
-```
-
----
-
-## 2. Configure environment variables
-
-Create your local environment file:
-
-```bash
 cp .env.example .env
-```
-
-Then configure the required database and application settings.
-
-Example:
-
-```env
-DB_NAME=postgres
-DB_USER=postgres
-DB_PASSWORD=password
-DB_HOST=postgres
-DB_PORT=5432
-SECRET_KEY=hex32generatedKey
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=10
-```
-
-> **Important:** Never commit your real `.env` file or production secrets to Git.
-
----
-
-# 🐳 Running with Docker
-
-The easiest way to run the complete application is with Docker Compose.
-
-### Start the application
-
-```bash
-docker compose up --build -d
-```
-
-### Apply database migrations
-
-```bash
-docker compose exec app alembic upgrade head
-```
-
-The API will then be available at:
-
-```text
-http://localhost:8000
-```
-
----
-
-# 📚 API Documentation
-
-FastAPI automatically generates interactive OpenAPI documentation.
-
-Once the application is running, open:
-
-### Swagger UI
-
-```text
-http://localhost:8000/docs
-```
-
-### ReDoc
-
-```text
-http://localhost:8000/redoc
-```
-
-Swagger UI allows you to explore endpoints, inspect request/response schemas, and send requests directly from your browser.
-
----
-
-# 💻 Local Development
-
-If you prefer to run the FastAPI application directly on your machine while keeping PostgreSQL inside Docker:
-
-### 1. Start PostgreSQL
-
-```bash
-docker compose up -d postgres
-```
-
-### 2. Install dependencies
-
-```bash
 uv sync
 ```
 
-### 3. Configure the database connection
+Fill in `.env`. This example is for a local development database:
 
-Update `.env` for local database access:
-
-```env
+```dotenv
+DB_NAME=notes
+DB_USER=notes
+DB_PASSWORD=local_notes_password
 DB_HOST=localhost
 DB_PORT=5432
+SECRET_KEY=replace_with_a_random_secret
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=15
 ```
 
-### 4. Run migrations
+Generate a secret and copy its output into `SECRET_KEY`:
+
+```bash
+uv run python -c 'import secrets; print(secrets.token_hex(32))'
+```
+
+Start the database, apply migrations, and run the API:
+
+```bash
+docker compose up -d postgres
+uv run alembic upgrade head
+uv run uvicorn app.main:app --reload
+```
+
+Open [Swagger UI](http://127.0.0.1:8000/docs). The root URL redirects to this documentation.
+
+### Run the complete application in Docker
+
+With the same `.env` configured:
+
+```bash
+docker compose up --build
+```
+
+Compose overrides the application database host to `postgres`. The current container startup command applies migrations before starting Uvicorn. It uses reload mode and should be treated as a development configuration.
+
+## Try the authenticated workflow
+
+1. Register through `POST /auth/register` with a username, email, and password. The endpoint returns the new user ID.
+2. Log in through `POST /auth/login`. Login accepts form-encoded `username` and `password`, not a JSON body.
+3. Use Swagger's **Authorize** control or send `Authorization: Bearer <access_token>`.
+4. Create a task through `POST /tasks/` and retrieve your list through `GET /tasks/`.
+5. Create tags through `POST /tags/` and associate them with a task using `tag_ids`.
+
+Example login:
+
+```bash
+curl -X POST http://127.0.0.1:8000/auth/login \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode 'username=demo' \
+  --data-urlencode 'password=replace_with_your_password'
+```
+
+Use the generated OpenAPI documentation for the current request fields and response models.
+
+## Database migrations
+
+Apply existing migrations:
 
 ```bash
 uv run alembic upgrade head
 ```
 
-### 5. Start the development server
+After changing a model, generate and inspect a migration:
 
 ```bash
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv run alembic revision --autogenerate -m "describe the schema change"
 ```
 
-The API will be available at:
+Review generated operations before applying them. The repository includes changes to task ownership/nullability and tag ownership and constraints.
 
-```text
-http://localhost:8000
-```
+## Tests and formatting
 
----
-
-# 🗃️ Database Migrations
-
-Database schema changes are managed using **Alembic**.
-
-Apply all available migrations:
+After configuring the local `.env`:
 
 ```bash
-uv run alembic upgrade head
+uv run python -m pytest app/tests -q
+uv run ruff check .
+uv run ruff format --check .
 ```
 
-Create a new migration:
+The tests cover password hashing, token decoding, tag counts, and selected user-model/database behavior. Database fixtures use SQLite. These are not comprehensive endpoint, PostgreSQL, or authorization tests.
 
-```bash
-uv run alembic revision --autogenerate -m "describe your change"
-```
+## Repository structure
 
-Rollback the latest migration:
+| Location | Responsibility |
+| --- | --- |
+| `app/api/` | Authentication, user, task, and tag routes |
+| `app/schemas/` | Pydantic request/response models |
+| `app/models/` | SQLAlchemy models and relationships |
+| `app/dao/` | Queries, mutations, and session handling |
+| `app/utils/` | Authentication and utility functions |
+| `app/exceptions/` | Application exceptions |
+| `app/tests/` | Unit tests and database fixtures |
+| `migration/versions/` | Alembic migration history |
 
-```bash
-uv run alembic downgrade -1
-```
+## Current limitations
 
-Using migrations keeps database schema changes reproducible across development and deployment environments.
+Authorization is implemented for selected workflows, but isolation is not complete across the API. Single-task reads and tag/user read routes are currently unauthenticated; some user-route calls also need alignment with the updated DAO signatures.
 
----
+Task updates currently clear tags when `tag_ids` is omitted. Tag assignment is looked up by ID without checking tag ownership. These behaviors need correction before using the application for private multi-user data.
 
-# 🔌 API
+The project is useful for examining the implementation and its trade-offs. It does not claim production readiness, complete access-control coverage, or comprehensive automated testing.
 
-The API exposes RESTful endpoints for authentication and task-related operations.
+## Author
 
-The complete and authoritative API specification is available through the generated Swagger documentation:
+[Rostyslav Tarasov](https://github.com/loppify).
 
-```text
-GET /docs
-```
+## License
 
-Example request:
-
-```bash
-curl http://localhost:8000/
-```
-
-For authenticated endpoints, obtain a JWT through the authentication flow and provide it using the standard Bearer authentication scheme:
-
-```text
-Authorization: Bearer <your-token>
-```
-
----
-
-# 🔒 Configuration & Security
-
-Configuration is managed through environment variables rather than hard-coded application values.
-
-Typical configuration includes:
-
-* Database credentials
-* Database host and port
-* Authentication secrets
-* Application environment
-* Other runtime configuration
-
-For local development:
-
-```bash
-cp .env.example .env
-```
-
-For production environments, use your deployment platform's secret/environment-variable management rather than committing credentials to the repository.
-
----
-
-# 🧪 Development Workflow
-
-A typical development workflow looks like this:
-
-```text
-1. Create / modify SQLAlchemy models
-              ↓
-2. Generate an Alembic migration
-              ↓
-3. Apply migration to PostgreSQL
-              ↓
-4. Create / update Pydantic schemas
-              ↓
-5. Implement API endpoint
-              ↓
-6. Run the application
-              ↓
-7. Test through Swagger / API client
-```
-
-This project is intentionally structured to make that workflow straightforward and repeatable.
-
----
-
-
-# 🎯 What This Project Demonstrates
-
-This project demonstrates practical experience with the core components of modern Python backend development:
-
-**API Development**
-
-Building RESTful APIs with FastAPI and OpenAPI.
-
-**Database Engineering**
-
-Designing relational models and working with PostgreSQL through SQLAlchemy 2.0.
-
-**Data Validation**
-
-Using Pydantic schemas to validate incoming requests and serialize API responses.
-
-**Authentication**
-
-Implementing JWT-based authentication and protecting API resources.
-
-**Database Versioning**
-
-Managing schema evolution through Alembic migrations.
-
-**Containerization**
-
-Running the application and PostgreSQL together using Docker Compose.
-
-**Modern Python Tooling**
-
-Using `uv` for fast, reproducible dependency management.
-
----
-
-# 📌 Project Status
-
-This project is actively structured as a backend engineering practice project and a foundation for further API development.
-
-It is intentionally focused on learning and applying real-world backend patterns rather than building a fully-featured production SaaS application.
-
----
-
-# 📄 License
-
-This project is licensed under the **MIT License**.
-
-See [LICENSE](LICENSE) for details.
-
----
-
-## 👤 Author
-
-**loppify**
-
-GitHub: [@loppify](https://github.com/loppify)
-
----
-
-<p align="center">
-  Built with Python, FastAPI, PostgreSQL, SQLAlchemy & Docker.
-</p>
+[MIT](LICENSE).

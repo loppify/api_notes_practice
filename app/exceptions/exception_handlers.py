@@ -7,7 +7,6 @@ from fastapi.exceptions import (
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 
-from app.exceptions.custom_exceptions import CREDENTIALS_EXCEPTION
 from app.utils.integrity_error_parser import parse_integrity_error
 
 
